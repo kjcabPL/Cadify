@@ -1,0 +1,40 @@
+#!/bin/bash
+
+VERSION="1.0.0"
+TARGET="cadify.py"
+ASSETS="./lib/converter.py"
+ICONFILE="./img/icon.ico"
+INCLUDE=""
+
+BUILD_DIR="cadify.build"
+BUILD_DIST="cadify.dist"
+DISTRO="dist"
+
+for items in $ASSETS; do
+  INCLUDE="$INCLUDE --include-data-files=$items=$items"
+done
+
+# Cleanup before compiling
+echo Preparing dist folder
+if [ -z $BUILD_DIST ]; then
+  echo $BUILD_DIST not found, proceed
+else
+  rm -rf $BUILD_DIST
+fi
+if [ -z $DISTRO ]; then
+  echo $DISTRO not found, proceed
+else
+  rm -rf $DISTRO
+fi
+
+# Compile the file
+python -m nuitka --standalone \
+                 --enable-plugin=tk-inter \
+                 --windows-icon-from-ico=$ICONFILE \
+                 --product-version=$VERSION \
+                 $INCLUDE $TARGET 
+
+# Cleanup build files
+echo Cleanup build files
+mv $BUILD_DIST $DISTRO
+rm -rf $BUILD_DIR
