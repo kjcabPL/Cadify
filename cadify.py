@@ -1,6 +1,8 @@
 import math
 import tkinter as tk
+import webbrowser
 from tkinter import *
+from datetime import datetime
 from tkinter.ttk import Combobox
 from lib.converter import Converter
 
@@ -12,6 +14,11 @@ baseText = f"1 CAD"
 targetText = f"42 PHP"
 
 labelFont1 = ("Arial", 20, "normal")
+footerFont = ("Arial", 8, "normal")
+
+year = str(datetime.now().year)
+footerText = f"Bitknvs Studios © {year}"
+siteLink = "https://bitknvs.com"
 
 # build tkinter and components
 main = tk.Tk()
@@ -19,6 +26,7 @@ main.title("Cadify")
 
 grpFields = Frame(padx = 10, pady = 10)
 grpButtons = Frame(padx = 10, pady = 10)
+grpFooter = Frame(pady = 5)
 
 txtConv1 = Entry(grpFields, width = 15)
 txtConv2 = Entry(grpFields, width = 15)
@@ -26,6 +34,7 @@ txtConv2 = Entry(grpFields, width = 15)
 lblBase = Label(grpFields, text = baseText, width = 8, font = labelFont1)
 lblTarget = Label(grpFields, text = targetText, width = 8, font = labelFont1)
 lblEquals = Label(grpFields, text = "=", width = 1, font = labelFont1)
+lblFooter = Label(grpFooter, text = footerText, font = footerFont, fg="blue")
 
 lbBase = Combobox(grpButtons, values = currencyOptions, state = "readonly", width = 13)
 lbRates = Combobox(grpButtons, values = [val for val in conv.rates.keys()], state = "readonly", width = 13)
@@ -35,6 +44,7 @@ choices = [val for val in conv.rates.keys()]
 # Arrange components and prep values
 grpFields.grid(row = 0, column = 0, padx = 10, pady = 10)
 grpButtons.grid(row = 1, column = 0, padx = 10, pady = 10)
+grpFooter.grid(row = 2, column = 0)
 
 txtConv1.grid(row = 0, column = 0, padx = 5, pady = 5 )
 txtConv2.grid(row = 0, column = 2, padx = 5, pady = 5 )
@@ -47,6 +57,7 @@ lbBase.grid(row = 1, column = 0, padx = 5, pady = 5)
 lblTo.grid(row = 1, column = 1, padx = 10, pady = 5)
 lbRates.grid(row = 1, column = 2, padx = 5, pady = 5)
 
+lblFooter.grid(row = 0, column = 0, padx = 5)
 
 txtConv1.insert(0, "1")
 lbBase.set(currencyOptions[0])
@@ -124,12 +135,33 @@ def updateUI(result, tbTarget):
     tbTarget.delete(0, tk.END)
     tbTarget.insert(0, res)
 
+# highlight link button on hover
+def hoverLink(event):
+    lbl = event.widget
+    changeFGColor(lbl, "royal blue")
+
+def leaveLink(event):
+    lbl = event.widget
+    changeFGColor(lbl, "blue")
+
+def clickLink(event):
+    lbl = event.widget
+    changeFGColor(lbl,"orange")
+    webbrowser.open(siteLink)
+
+def changeFGColor(item, color):
+    item.config(fg = color)
+
 # Add actions to components
 txtConv1.bind("<KeyRelease>", onTBUpdate)
 txtConv2.bind("<KeyRelease>", onTBUpdate)
 
 lbBase.bind("<<ComboboxSelected>>", onBaseSelected)
 lbRates.bind("<<ComboboxSelected>>", onTargetSelected)
+
+lblFooter.bind("<Button-1>", clickLink)
+lblFooter.bind("<Enter>", hoverLink)
+lblFooter.bind("<Leave>", leaveLink)
 
 # Final Actions before running
 updateUI(1, txtConv2)
